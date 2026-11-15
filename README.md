@@ -8,7 +8,8 @@ A minimalist, standalone count-up and countdown timeline.
 - Custom categories, collapse/expand, category accent colors
 - Grouped and all-events views; search, time filters, multiple sorts
 - Desktop drag-and-drop and mobile touch/pointer reordering for events and categories
-- Recurring weekly, monthly, and yearly dates
+- Recurring weekly, monthly, and yearly dates with calendar-aware month-end and leap-year handling
+- Duplicate an existing event from its editor
 - Dark/light theme, local browser persistence, JSON import/export
 
 - Installable PWA with offline app-shell caching and custom icon
