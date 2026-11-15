@@ -8,3 +8,6 @@ test('yearly leap day clamps',()=>{const e=event('2024-02-29',{repeat:'yearly'})
 test('weekly recurrence respects local weekdays',()=>{const e=event('2026-03-01',{repeat:'weekly',time:'10:00'});const d=t.effective(e,at(2026,3,9));assert.equal(d.getDay(),0);assert.equal(d.getHours(),10)});
 test('forced count up before start is zero',()=>{const e=event('2028-01-01',{mode:'up'});assert.equal(t.measure(e,at(2027,1,1)).totalDays,0)});
 test('exact times have seconds',()=>{const e=event('2027-03-20',{time:'12:00',precision:'exact'});assert.equal(t.timing(e,at(2027,3,20,11)).label,'0d 01:00:00')});
+
+test('date-only slider shows live hours to local midnight',()=>{const e=event('2027-03-20');const v=t.values(e,at(2027,3,19,21),3);assert.equal(v[3],0);assert.equal(v[4],3);assert.equal(t.timing(e,at(2027,3,19,21)).label,'1 days')});
+test('slider decomposition keeps all seconds',()=>{const e=event('2027-03-20',{time:'12:00'});const now=at(2027,3,19,10);for(let level=2;level<=6;level++){const v=t.values(e,now,level);const seconds=v[2]*604800+v[3]*86400+v[4]*3600+v[5]*60+v[6];assert.equal(seconds,26*3600)}});
