@@ -7,7 +7,7 @@ function calendarDelta(a,b){return Math.round((Date.UTC(b.getFullYear(),b.getMon
 function candidate(year,month,day,original){const d=new Date(year,month,1,original.getHours(),original.getMinutes(),0,0);d.setDate(Math.min(day,new Date(year,month+1,0).getDate()));return d}
 function effective(e,now){const origin=stamp(e),repeat=e.repeat||'none';if(repeat==='none'||origin>now)return origin;const day=origin.getDate();if(repeat==='weekly'){const weeks=Math.max(0,Math.floor(calendarDelta(origin,now)/7));const d=new Date(origin);d.setDate(origin.getDate()+weeks*7);if(d<now)d.setDate(d.getDate()+7);return d}if(repeat==='monthly'){let offset=Math.max(0,(now.getFullYear()-origin.getFullYear())*12+now.getMonth()-origin.getMonth());let d=candidate(origin.getFullYear(),origin.getMonth()+offset,day,origin);if(d<now)d=candidate(origin.getFullYear(),origin.getMonth()+offset+1,day,origin);return d}if(repeat==='yearly'){let y=Math.max(origin.getFullYear(),now.getFullYear());let d=candidate(y,origin.getMonth(),day,origin);if(d<now)d=candidate(y+1,origin.getMonth(),day,origin);return d}return origin}
 function measure(e,now){const target=effective(e,now);const delta=target-now;const direction=e.mode==='up'?'up':e.mode==='down'?'down':delta>=0?'down':'up';const active=(direction==='up'?delta<=0:delta>=0);const a=active?new Date(Math.min(now,target)):new Date(now),b=active?new Date(Math.max(now,target)):new Date(now);
-const dateOnly=!e.time;const totalSeconds=dateOnly?(active?Math.abs(calendarDelta(now,target))*86400:0):Math.floor((b-a)/1000);
+const dateOnly=!e.time;const totalSeconds=Math.max(0,Math.floor((b-a)/1000));
 const totalDays=dateOnly?(active?Math.abs(calendarDelta(now,target)):0):Math.floor(totalSeconds/86400);
 return {target,direction,active,a,b,dateOnly,totalSeconds,totalDays,distance:Math.abs(delta)}}
 function addYearsClamped(d,n){return candidate(d.getFullYear()+n,d.getMonth(),d.getDate(),d)}
@@ -20,7 +20,7 @@ while(addMonthsClamped(cursor,months+1)<=m.b)months++;
 cursor=addMonthsClamped(cursor,months);
 if(level===0){v[0]=years;v[1]=months}else v[1]=years*12+months;
 seconds=Math.max(0,Math.floor((m.b-cursor)/1000))
-}else if(level<=1&&m.dateOnly&&m.active){let cursor=new Date(m.a),years=0,months=0;while(addYearsClamped(cursor,years+1)<=m.b)years++;cursor=addYearsClamped(cursor,years);while(addMonthsClamped(cursor,months+1)<=m.b)months++;cursor=addMonthsClamped(cursor,months);if(level===0){v[0]=years;v[1]=months}else v[1]=years*12+months;seconds=Math.max(0,calendarDelta(cursor,m.b))*86400}
+}else if(level<=1&&m.dateOnly&&m.active){let cursor=new Date(m.a),years=0,months=0;while(addYearsClamped(cursor,years+1)<=m.b)years++;cursor=addYearsClamped(cursor,years);while(addMonthsClamped(cursor,months+1)<=m.b)months++;cursor=addMonthsClamped(cursor,months);if(level===0){v[0]=years;v[1]=months}else v[1]=years*12+months;seconds=Math.max(0,Math.floor((m.b-cursor)/1000))}
 if(level<=2){v[2]=Math.floor(seconds/604800);seconds%=604800}
 if(level<=3){v[3]=Math.floor(seconds/86400);seconds%=86400}
 if(level<=4){v[4]=Math.floor(seconds/3600);seconds%=3600}
