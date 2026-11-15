@@ -26,6 +26,6 @@ if(level<=3){v[3]=Math.floor(seconds/86400);seconds%=86400}
 if(level<=4){v[4]=Math.floor(seconds/3600);seconds%=3600}
 if(level<=5){v[5]=Math.floor(seconds/60);seconds%=60}
 v[6]=seconds;return v}
-function timing(e,now){const m=measure(e,now),seconds=m.totalSeconds,days=m.totalDays;const label=e.precision==='exact'&&e.time?days+'d '+pad(Math.floor(seconds/3600)%24)+':'+pad(Math.floor(seconds/60)%60)+':'+pad(seconds%60):days.toLocaleString()+' days';return {label,sub:m.direction==='up'?'elapsed':'remaining',distance:m.distance,date:m.target}}
+function timing(e,now){const m=measure(e,now),seconds=m.totalSeconds,days=m.totalDays;const label=e.precision==='exact'&&e.time?days+'d '+pad(Math.floor(seconds/3600)%24)+':'+pad(Math.floor(seconds/60)%60)+':'+pad(seconds%60):days.toLocaleString()+(days===1?' day':' days');return {label,sub:m.direction==='up'?'elapsed':'remaining',distance:m.distance,date:m.target}}
 root.CountTime={parseDate,stamp,calendarDelta,effective,measure,values,timing};
 })(globalThis);
