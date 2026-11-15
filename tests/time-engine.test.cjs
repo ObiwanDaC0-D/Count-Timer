@@ -1,0 +1,10 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const vm=require('node:vm');const fs=require('node:fs');const ctx={Date,Math,Error,Number,String,RegExp};ctx.globalThis=ctx;vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../time-engine.js'),'utf8'),ctx);const t=ctx.CountTime;const event=(date,more={})=>({date,time:'',repeat:'none',mode:'auto',precision:'days',...more});const at=(y,m,d,h=0)=>new Date(y,m-1,d,h);
+test('strict invalid calendar dates',()=>{assert.throws(()=>t.parseDate('2027-02-30'));assert.throws(()=>t.parseDate('2027-13-01'));assert.equal(t.parseDate('2028-02-29').getDate(),29)});
+test('date-only day counts',()=>{assert.equal(t.timing(event('2027-03-20'),at(2027,3,15)).label,'5 days')});
+test('slider units preserve duration',()=>{const e=event('2027-03-20');const now=at(2026,11,14);for(let level=0;level<=6;level++){const v=t.values(e,now,level);assert.equal(v.length,7);assert.ok(v.every(x=>Number.isInteger(x)&&x>=0));if(level===3)assert.equal(v[3],126)}});
+test('months do not discard weeks',()=>{const e=event('2027-03-20');const v=t.values(e,at(2026,11,14),0);assert.ok(v[2]>=0);assert.ok(v[3]>=0);assert.equal(v[0],0);assert.equal(v[1],4)});
+test('monthly end-of-month stays anchored',()=>{const e=event('2026-01-31',{repeat:'monthly'});assert.equal(t.effective(e,at(2026,2,1)).getDate(),28);assert.equal(t.effective(e,at(2026,3,1)).getDate(),31)});
+test('yearly leap day clamps',()=>{const e=event('2024-02-29',{repeat:'yearly'});assert.equal(t.effective(e,at(2025,1,1)).getDate(),28)});
+test('weekly recurrence respects local weekdays',()=>{const e=event('2026-03-01',{repeat:'weekly',time:'10:00'});const d=t.effective(e,at(2026,3,9));assert.equal(d.getDay(),0);assert.equal(d.getHours(),10)});
+test('forced count up before start is zero',()=>{const e=event('2028-01-01',{mode:'up'});assert.equal(t.measure(e,at(2027,1,1)).totalDays,0)});
+test('exact times have seconds',()=>{const e=event('2027-03-20',{time:'12:00',precision:'exact'});assert.equal(t.timing(e,at(2027,3,20,11)).label,'0d 01:00:00')});
