@@ -7,8 +7,8 @@ function calendarDelta(a,b){return Math.round((Date.UTC(b.getFullYear(),b.getMon
 function candidate(year,month,day,original){const d=new Date(year,month,1,original.getHours(),original.getMinutes(),0,0);d.setDate(Math.min(day,new Date(year,month+1,0).getDate()));return d}
 function effective(e,now){const origin=stamp(e),repeat=e.repeat||'none';if(repeat==='none'||origin>now)return origin;const day=origin.getDate();if(repeat==='weekly'){const weeks=Math.max(0,Math.floor(calendarDelta(origin,now)/7));const d=new Date(origin);d.setDate(origin.getDate()+weeks*7);if(d<now)d.setDate(d.getDate()+7);return d}if(repeat==='monthly'){let offset=Math.max(0,(now.getFullYear()-origin.getFullYear())*12+now.getMonth()-origin.getMonth());let d=candidate(origin.getFullYear(),origin.getMonth()+offset,day,origin);if(d<now)d=candidate(origin.getFullYear(),origin.getMonth()+offset+1,day,origin);return d}if(repeat==='yearly'){let y=Math.max(origin.getFullYear(),now.getFullYear());let d=candidate(y,origin.getMonth(),day,origin);if(d<now)d=candidate(y+1,origin.getMonth(),day,origin);return d}return origin}
 function measure(e,now){const target=effective(e,now);const delta=target-now;const direction=e.mode==='up'?'up':e.mode==='down'?'down':delta>=0?'down':'up';const active=(direction==='up'?delta<=0:delta>=0);const a=active?new Date(Math.min(now,target)):new Date(now),b=active?new Date(Math.max(now,target)):new Date(now);
-const dateOnly=!e.time;const totalSeconds=dateOnly?Math.abs(calendarDelta(now,target))*86400:Math.floor((b-a)/1000);
-const totalDays=dateOnly?Math.abs(calendarDelta(now,target)):Math.floor(totalSeconds/86400);
+const dateOnly=!e.time;const totalSeconds=dateOnly?(active?Math.abs(calendarDelta(now,target))*86400:0):Math.floor((b-a)/1000);
+const totalDays=dateOnly?(active?Math.abs(calendarDelta(now,target)):0):Math.floor(totalSeconds/86400);
 return {target,direction,active,a,b,dateOnly,totalSeconds,totalDays,distance:Math.abs(delta)}}
 function addYearsClamped(d,n){return candidate(d.getFullYear()+n,d.getMonth(),d.getDate(),d)}
 function addMonthsClamped(d,n){return candidate(d.getFullYear(),d.getMonth()+n,d.getDate(),d)}
